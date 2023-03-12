@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:my_garage/utils/car_tile.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+// import '../utils/car_add.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -40,6 +46,12 @@ class _HomePageState extends State<HomePage> {
             fit: BoxFit.fitHeight,
             height: 300,
           ),
+          CarTile(),
+          AddButton(
+            carBrand: 'Mercedes-Benz',
+            carImagePath: 'lib/images/auto1.jpg',
+            carModel: 'SL',
+          ),
         ],
       ),
 
@@ -54,6 +66,48 @@ class _HomePageState extends State<HomePage> {
       //         icon: Icon(Icons.notifications), label: "notifications"),
       //   ],
       // ),
+    );
+  }
+}
+
+class AddButton extends StatelessWidget {
+  final String carImagePath;
+  final String carBrand;
+  final String carModel;
+  // final String carProductionYear;
+  // final String engineCapacity;
+  // final String enginePower;
+  // final String fuelType;
+
+  AddButton({
+    required this.carImagePath,
+    required this.carBrand,
+    required this.carModel,
+    // this.carProductionYear,
+    // this.engineCapacity,
+    // this.enginePower,
+    // this.fuelType,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // Cloud Firestore initialization with one particular collection of cars
+    CollectionReference cars = FirebaseFirestore.instance.collection('cars');
+
+    Future<void> addCar() {
+      return cars
+          .add({
+            'car_image_path': carImagePath,
+            'car_brand': carBrand,
+            'car_model': carModel,
+          })
+          .then((value) => print('Car added'))
+          .catchError((error) => print("Failed to add car: $error"));
+    }
+
+    return FloatingActionButton(
+      onPressed: addCar,
+      child: const Icon(Icons.add),
     );
   }
 }
